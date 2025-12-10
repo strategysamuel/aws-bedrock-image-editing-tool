@@ -113,29 +113,31 @@ success/failure
 Perfect for auditing and analytics.
 
 📁 Folder Structure
+
 aws-bedrock-image-editing-tool/
+├─ frontend/
+│  ├─ index.html               # Image editing UI (canvas + controls)
+│  ├─ config.js                # Cognito, API Gateway, region configuration
+│  ├─ styles.css               # Neon terminal-style UI styling
+│  └─ vite.svg (or other assets)  # Static assets used by the UI
 │
-├── frontend/
-│   ├── index.html
-│   ├── config.js
-│   ├── styles.css
-│   ├── vite.svg
-│   └── (assets…)
+├─ backend/
+│  └─ lambda_function.py       # Lambda handler that calls Bedrock
+│                              # and logs metadata to DynamoDB
 │
-├── backend/
-│   └── lambda_function.py
+├─ screenshots/
+│  ├─ Login_Screen.png
+│  ├─ Password_change_Screen.png
+│  ├─ Authorisation_Screen.png
+│  ├─ Imageupload_screen.png
+│  ├─ Imageediting_screen.png
+│  ├─ ImageGeneration_screen.png
+│  ├─ DynamoDB_Imageconfirmation_Screen.png
+│  └─ DynamoDB_AttributesConfirmation_Screen.png
+│      # Screenshots used in the README / blog
 │
-├── screenshots/
-│   ├── Login_Screen.png
-│   ├── Password_change_Screen.png
-│   ├── Authorisation_Screen.png
-│   ├── Imageupload_Screen.png
-│   ├── Imageediting_Screen.png
-│   ├── ImageGeneration_Screen.png
-│   ├── DynamoDB_Imageconfirmation_Screen.png
-│   └── DynamoDB_AttributesConfirmation_Screen.png
-│
-└── README.md
+└─ README.md                   # Project documentation
+
 
 🛠️ AWS Services Used
 AWS Service	Purpose

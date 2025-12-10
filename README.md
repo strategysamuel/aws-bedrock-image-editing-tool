@@ -114,6 +114,7 @@ Perfect for auditing and analytics.
 
 📁 Folder Structure
 
+```text
 aws-bedrock-image-editing-tool/
 ├─ frontend/
 │  ├─ index.html               # Image editing UI (canvas + controls)
@@ -137,6 +138,7 @@ aws-bedrock-image-editing-tool/
 │      # Screenshots used in the README / blog
 │
 └─ README.md                   # Project documentation
+
 
 
 🛠️ AWS Services Used

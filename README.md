@@ -1,200 +1,195 @@
 AWS Bedrock Image Editing Tool
 
-Serverless image editing application powered by Amazon Bedrock, AWS Lambda, API Gateway, Amazon Cognito, DynamoDB, and AWS Amplify.
+Serverless Inpainting, Outpainting & Background Cleanup Using Amazon Bedrock Titan Image Generator v2
 
-This project demonstrates how to build a complete, secure, scalable image-editing pipeline using Titan Image Generator v2 for inpainting and outpainting operations — fully serverless and production-ready.
+🔗 Live Demo (AWS Amplify Hosted App):
+https://staging.d10wzvh8ozqbav.amplifyapp.com/
 
 🚀 Overview
 
-Modern image editing often requires high-quality AI models, intuitive user interfaces, and scalable backend systems.
-This project solves that by integrating:
+This project is a fully serverless image-editing application using Amazon Bedrock's Titan Image Generator v2.
+Users can upload an image, draw a mask, and generate new content using:
 
-🎨 Frontend UI hosted on AWS Amplify
+INPAINTING – Modify selected region
 
-🧠 Image generation with Amazon Titan (Bedrock)
+OUTPAINTING – Extend background outward
 
-🔐 Secure authentication via Cognito User Pools
+PRECISE OUTPAINTING – High-fidelity extension for real-estate/product photos
 
-🔌 API Gateway + Lambda for model invocation
+All generations are logged in DynamoDB with analytics like:
 
-🗄️ DynamoDB for logging & analytics
+Prompt
 
-This solution is perfect for learning Bedrock, building real-world inpainting/outpainting tools, or extending into commercial use cases (real estate editing, product showcase cleanup, background removal, etc.)
+Model used
+
+Image input/output size
+
+Generation time
+
+Success/failure
+
+Perfect for learning AWS Bedrock, building professional editing tools, or extending into commercial use cases.
+
+🧠 Why This Tool?
+
+✔ Real-world use case (real estate, product photography, cleanup, restoration)
+✔ Secure authentication via Amazon Cognito
+✔ Scalable backend via Lambda + API Gateway
+✔ Zero server maintenance (pure serverless)
+✔ Analytics tracking for performance insights
 
 🏗️ Architecture Diagram
-🧱 **High-Level Architecture**
 
-```text
-[ User Browser ]
-      │
-      ▼
-[AWS Amplify Hosting]
-(Static frontend: index.html + JS + config.js + styles.css)
-      │  HTTPS (Cognito auth + JWT)
-      ▼
-[Amazon API Gateway - REST API /dev/generate]
-      │  Invokes
-      ▼
-[AWS Lambda - ImageEditBackend]
-  • Validates JWT from Cognito
-  • Parses mask, base image, and prompt
-  • Calls Bedrock Titan Image Generator v2
-  • Logs request/response metadata to DynamoDB
-      │
-      ├─► [Amazon Bedrock Runtime]
-      │      • Model: amazon.titan-image-generator-v2:0
-      │      • Returns edited images (base64)
-      │
-      └─► [Amazon DynamoDB - ImageGenerationTable]
-             • Stores: request_id, timestamp, prompt, mode,
-               input sizes, output size, generation time, success flag
+Below is a clean, readable architecture representation for your README:
 
+                     ┌──────────────────────────┐
+                     │        User Browser       │
+                     │  (AWS Amplify Hosted UI)  │
+                     └──────────────┬───────────┘
+                                    │
+                                    ▼
+                     ┌──────────────────────────┐
+                     │   Amazon Cognito Auth    │
+                     │  (User Login + JWT Token)│
+                     └──────────────┬───────────┘
+                                    │ (Authenticated)
+                                    ▼
+                     ┌──────────────────────────┐
+                     │   Amazon API Gateway     │
+                     │   POST /generate         │
+                     └──────────────┬───────────┘
+                                    │
+                                    ▼
+                     ┌──────────────────────────┐
+                     │    AWS Lambda Backend    │
+                     │  - Processes request     │
+                     │  - Prepares Titan input  │
+                     │  - Logs analytics        │
+                     └──────────────┬───────────┘
+                                    │
+                                    ▼
+                     ┌──────────────────────────┐
+                     │ Amazon Bedrock Runtime   │
+                     │ Titan Image Generator v2 │
+                     └──────────────┬───────────┘
+                                    │
+                                    ▼
+                     ┌──────────────────────────┐
+                     │ Amazon DynamoDB Table    │
+                     │  ImageGenerationTable     │
+                     │ Logs each generation     │
+                     └──────────────────────────┘
 
-🔍 Features
-🎯 Image Editing Modes
+✨ Features
+🎨 Image Editing Modes
+Mode	What It Does
+INPAINTING	Modify selected area of an image
+OUTPAINTING	Extend image beyond original boundary
+PRECISE OUTPAINTING	Cleaner, sharper extensions
+🔒 Secure Auth
 
-INPAINTING – Modify inside the selected mask
+Only authenticated users can generate images. Cognito handles sign-up, sign-in, and password reset.
 
-OUTPAINTING – Extend background beyond the mask
+📊 DynamoDB Logging
 
-PRECISE OUTPAINTING – Cleaner edges for real estate/product images
+Each request stores:
 
-🛡️ Secure Auth
+request_id
 
-Cognito ensures only authenticated users can generate images.
+prompt
 
-📊 Analytics
+model_id
 
-Every request is logged:
-
-request ID
-
-timestamps
-
-prompt text
-
-model used
+mode
 
 input image size
 
 output image size
 
-generation time in ms
+generation time
 
-success/failure state
+success/failure
 
-Perfect for monitoring performance and usage.
+Perfect for auditing and analytics.
 
-### 2️⃣ Folder Structure
-
-```md
-📁 **Repository Structure**
-
-```text
+📁 Folder Structure
 aws-bedrock-image-editing-tool/
-├─ frontend/
-│  ├─ index.html               # Image editing UI (canvas + controls)
-│  ├─ config.js                # Cognito, API Gateway, region configuration
-│  ├─ styles.css               # Neon terminal-style UI styling
-│  └─ vite.svg (or other assets)  # Static assets used by the UI
 │
-├─ backend/
-│  └─ lambda_function.py       # Lambda handler that calls Bedrock
-│                              # and logs metadata to DynamoDB
+├── frontend/
+│   ├── index.html
+│   ├── config.js
+│   ├── styles.css
+│   ├── vite.svg
+│   └── (assets…)
 │
-├─ screenshots/
-│  ├─ Login_Screen.png
-│  ├─ Password_change_Screen.png
-│  ├─ Authorisation_Screen.png
-│  ├─ Imageupload_screen.png
-│  ├─ Imageediting_screen.png
-│  ├─ ImageGeneration_screen.png
-│  ├─ DynamoDB_Imageconfirmation_Screen.png
-│  └─ DynamoDB_AttributesConfirmation_Screen.png
-│      # Screenshots used in the README / blog
+├── backend/
+│   └── lambda_function.py
 │
-└─ README.md                   # Project documentation
+├── screenshots/
+│   ├── Login_Screen.png
+│   ├── Password_change_Screen.png
+│   ├── Authorisation_Screen.png
+│   ├── Imageupload_Screen.png
+│   ├── Imageediting_Screen.png
+│   ├── ImageGeneration_Screen.png
+│   ├── DynamoDB_Imageconfirmation_Screen.png
+│   └── DynamoDB_AttributesConfirmation_Screen.png
+│
+└── README.md
 
+🛠️ AWS Services Used
+AWS Service	Purpose
+Amazon Bedrock	Titan Image Generator v2 for inpainting/outpainting
+AWS Lambda	Backend logic + Bedrock invocation
+Amazon API Gateway	REST endpoint for frontend
+Amazon Cognito	Auth & JWT token validation
+Amazon DynamoDB	Logging analytics + request metadata
+AWS Amplify Hosting	Hosting the frontend
+⚙️ Backend Lambda Logic (High-Level)
 
-⚙️ AWS Services Used
-Service	Purpose
-Amazon Bedrock (Titan Image Generator v2)	Inpainting, outpainting image generation
-AWS Lambda	Backend compute to call Bedrock and return results
-API Gateway	REST API endpoint for frontend → Lambda
-Amazon Cognito	User authentication and token validation
-Amazon DynamoDB	Logging every image generation event
-AWS Amplify Hosting	Frontend static website hosting
-🧩 Backend Lambda Function
+The Lambda function:
 
-Full code is available in:
+Validates request + JWT token
 
-📁 backend/lambda_function.py
-This function performs:
+Extracts mask, base image & prompt
 
-Request validation
+Prepares Titan Image Generator v2 request
 
-Image + mask extraction
+Calls Bedrock Runtime
 
-Titan model invocation
+Returns generated images
 
-Error handling
+Stores analytics in DynamoDB
 
-DynamoDB structured logging
+Error-handling ensures all failures still get logged.
 
-Response formatting
+📈 Scaling Strategy
+🌐 Frontend Scaling
 
-🖥️ Frontend
+Amplify Hosting auto-scales globally with CDN distribution.
 
-Located in:
+⚙️ Backend Scaling
 
-📁 frontend/
+API Gateway scales to tens of thousands of RPS
 
-Includes:
+Lambda auto-scales with concurrency
 
-UI for image upload & masking
+DynamoDB auto-scales with on-demand capacity
 
-Prompt input
+🔮 Future Enhancements
 
-Mode selection
+Add S3 for storing images
 
-JWT auth handling
+Add CloudWatch dashboards for metrics
 
-API request builder
+Add model selection (SDXL, Imagen, etc.)
 
-Live preview + download
+Add batch editing & presets
 
-🧪 How to Run Locally
+📚 Full Code and Resources
 
-Clone the project:
+🔗 GitHub Repository:
+https://github.com/strategysamuel/aws-bedrock-image-editing-tool
 
-git clone https://github.com/strategysamuel/aws-bedrock-image-editing-tool
-cd aws-bedrock-image-editing-tool
-
-
-Frontend is static — open index.html directly or host via Amplify.
-
-Lambda deployment requires:
-
-Titan model access
-
-DynamoDB table named ImageGenerationTable
-
-API Gateway with Cognito Authorizer
-
-📸 Screenshots
-
-All screenshots are located in /screenshots for blog/article integration.
-
-🌐 Live Demo
-
-Amplify Hosted App:
-👉 https://staging.d10wzvh8ozqbav.amplifyapp.com/
-
-📦 Repository Link
-
-GitHub Repo:
-👉 https://github.com/strategysamuel/aws-bedrock-image-editing-tool
-
-📝 License
-
-This project is for educational and workshop use.
+🔗 Live Demo:
+https://staging.d10wzvh8ozqbav.amplifyapp.com/

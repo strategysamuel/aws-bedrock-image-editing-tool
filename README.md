@@ -22,25 +22,33 @@ This project solves that by integrating:
 This solution is perfect for learning Bedrock, building real-world inpainting/outpainting tools, or extending into commercial use cases (real estate editing, product showcase cleanup, background removal, etc.)
 
 🏗️ Architecture Diagram
-[User Browser] 
-      |
-      V
-[AWS Amplify Hosting]  -->  (index.html + JS)
-      |
-      V
-[Amazon Cognito Authentication]
-      |
-      V
-[API Gateway (POST /generate)]
-      |
-      V
-[AWS Lambda - Image Editing Handler]
-      |
-      |--> Calls Titan (Bedrock Runtime)
-      |--> Logs data to DynamoDB
-      |
-      V
-[Amazon DynamoDB - ImageGenerationTable]
+🧱 **High-Level Architecture**
+
+```text
+[ User Browser ]
+      │
+      ▼
+[AWS Amplify Hosting]
+(Static frontend: index.html + JS + config.js + styles.css)
+      │  HTTPS (Cognito auth + JWT)
+      ▼
+[Amazon API Gateway - REST API /dev/generate]
+      │  Invokes
+      ▼
+[AWS Lambda - ImageEditBackend]
+  • Validates JWT from Cognito
+  • Parses mask, base image, and prompt
+  • Calls Bedrock Titan Image Generator v2
+  • Logs request/response metadata to DynamoDB
+      │
+      ├─► [Amazon Bedrock Runtime]
+      │      • Model: amazon.titan-image-generator-v2:0
+      │      • Returns edited images (base64)
+      │
+      └─► [Amazon DynamoDB - ImageGenerationTable]
+             • Stores: request_id, timestamp, prompt, mode,
+               input sizes, output size, generation time, success flag
+
 
 🔍 Features
 🎯 Image Editing Modes
@@ -77,28 +85,36 @@ success/failure state
 
 Perfect for monitoring performance and usage.
 
-📁 Folder Structure
+### 2️⃣ Folder Structure
+
+```md
+📁 **Repository Structure**
+
+```text
 aws-bedrock-image-editing-tool/
+├─ frontend/
+│  ├─ index.html               # Image editing UI (canvas + controls)
+│  ├─ config.js                # Cognito, API Gateway, region configuration
+│  ├─ styles.css               # Neon terminal-style UI styling
+│  └─ vite.svg (or other assets)  # Static assets used by the UI
 │
-├── frontend/
-│   ├── index.html
-│   ├── config.js
-│   ├── styles.css
-│   └── assets...
+├─ backend/
+│  └─ lambda_function.py       # Lambda handler that calls Bedrock
+│                              # and logs metadata to DynamoDB
 │
-├── backend/
-│   └── lambda_function.py
+├─ screenshots/
+│  ├─ Login_Screen.png
+│  ├─ Password_change_Screen.png
+│  ├─ Authorisation_Screen.png
+│  ├─ Imageupload_screen.png
+│  ├─ Imageediting_screen.png
+│  ├─ ImageGeneration_screen.png
+│  ├─ DynamoDB_Imageconfirmation_Screen.png
+│  └─ DynamoDB_AttributesConfirmation_Screen.png
+│      # Screenshots used in the README / blog
 │
-├── screenshots/
-│   ├── Login_Screen.png
-│   ├── Password_change_Screen.png
-│   ├── Imageupload_screen.png
-│   ├── Imageediting_screen.png
-│   ├── ImageGeneration_screen.png
-│   ├── DynamoDB_Imageconfirmation_Screen.png
-│   └── DynamoDB_AttributesConfirmation_Screen.png
-│
-└── README.md
+└─ README.md                   # Project documentation
+
 
 ⚙️ AWS Services Used
 Service	Purpose
